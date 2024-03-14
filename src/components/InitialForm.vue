@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { clearLine } from 'readline';
 import { ref, nextTick } from 'vue'
 import type { Ref } from 'vue'
+
+const emit = defineEmits(['formed'])
 
 type InitialForm = {
   state: string,
@@ -109,11 +110,12 @@ onCreateAsk()
 function onEnd() {
   localStorage.setItem('inititalFormed', 'true')
   localStorage.setItem('inititalForm', JSON.stringify(initialForm))
+  emit('formed')
 }
 </script>
 
 <template>
-  <div class="chat-box bg-white shadow-2xl p-4 h-full flex flex-col">
+  <div class="chat-box fixed w-full h-full left-0 top-0 bg-white shadow-2xl p-4 h-full flex flex-col">
     <div class="flex-1 chat-list-box w-full overflow-y-scroll" ref="listBox">
       <template v-for="(chat, index) of chatList" :key="index">
         <div v-if="chat.role === 'assistant'" class="chat chat-start">

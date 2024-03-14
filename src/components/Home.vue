@@ -13,11 +13,17 @@ document.addEventListener('login', () => {
       localStorage.setItem('attraction', JSON.stringify(attraction.value))
     })
 })
+
+// TODO 测试用
+function clean() {
+  localStorage.removeItem('inititalForm')
+  localStorage.removeItem('inititalFormed')
+}
 </script>
 
 <template>
   <div class="w-full h-full">
-    <p>
+    <p @click="clean">
       当前景区：{{ attraction?.name }}
     </p>
   </div>
