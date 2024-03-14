@@ -52,7 +52,7 @@ async function onRegister() {
       <div class="w-full max-w-lg">
         <div class="leading-loose">
           <form class="max-w-sm p-10 m-auto rounded shadow-xl bg-white/25" id="formLogin" @submit="onSubmit">
-            <p class="mb-8 text-2xl font-light text-center text-white">AI导游大师后台管理-登录</p>
+            <p class="mb-8 text-2xl font-light text-center text-white">君有迹</p>
             <div class="mb-2">
               <div class="relative">
                 <input v-model.trim="email" type="text" id="login-with-bg-email"
@@ -75,8 +75,8 @@ async function onRegister() {
               </button>
             </div>
             <div class="text-center">
-              <a
-                class="right-0 inline-block text-sm font-light align-baseline text-500 hover:text-gray-800 cursor-pointer">忘记密码？</a>
+              <!-- <a
+                class="right-0 inline-block text-sm font-light align-baseline text-500 hover:text-gray-800 cursor-pointer">忘记密码？</a> -->
             </div>
           </form>
         </div>
