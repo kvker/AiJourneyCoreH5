@@ -4,7 +4,7 @@ import type { Ref } from 'vue'
 
 const emit = defineEmits(['change'])
 
-const currentIndex = ref(1)
+const currentIndex = ref(0)
 
 function onClickTabbarItem(index: number) {
   currentIndex.value = index

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import type { Ref } from 'vue'
 import { db } from '@/services/cloud'
+import Map from '@/components/Common/Map.vue'
 
 const attraction: Ref<Attraction> = ref(JSON.parse(localStorage.getItem('attraction') as string))
 // 如果依赖用户登录（或匿名登录），则需要监听此事件
@@ -19,13 +20,18 @@ function clean() {
   localStorage.removeItem('inititalForm')
   localStorage.removeItem('inititalFormed')
 }
+
+// 地图
+const dialogMapVisible = ref(false)
+const defaultLnglat = ref({ lng: 116.397428, lat: 39.90923 })
+function onChooseLnglat(lnglat: Lnglat) {
+  console.log(lnglat)
+}
 </script>
 
 <template>
-  <div class="home-container w-full h-full">
-    <p @click="clean">
-      当前景区：{{ attraction?.name }}
-    </p>
+  <div class="home-container">
+    <Map :visible="dialogMapVisible" :defaultLnglat="defaultLnglat" @choose="onChooseLnglat" />
   </div>
 </template>
 

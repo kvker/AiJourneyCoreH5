@@ -21,43 +21,37 @@ onMounted(() => {
   map = new T.Map('mapDiv')
   map.addEventListener("click", onMapClick)
   lo = new T.Geolocation()
-})
 
-watch(() => props.visible, (val) => {
-  if (val === true) {
-    mapDialog.value!.showModal()
-    loading.value = true
-    lo.getCurrentPosition(function (this: any, e: any) {
-      if (this.getStatus() == 0) {
-        map.centerAndZoom(e.lnglat, 15)
-        if (props.defaultLnglat) {
-          addMarker(props.defaultLnglat)
-        }
+  lo.getCurrentPosition(function (this: any, e: any) {
+    if (this.getStatus() == 0) {
+      map.centerAndZoom(e.lnglat, 15)
+      if (props.defaultLnglat) {
+        addMarker(props.defaultLnglat)
       }
-      if (this.getStatus() == 1) {
-        map.centerAndZoom(e.lnglat, 15)
-        if (props.defaultLnglat) {
-          addMarker(props.defaultLnglat)
-        }
+    }
+    if (this.getStatus() == 1) {
+      map.centerAndZoom(e.lnglat, 15)
+      if (props.defaultLnglat) {
+        addMarker(props.defaultLnglat)
       }
-      loading.value = false
-    }, {
-      enableHighAccuracy: true,
-      maximumAge: 10000,
-      timeout: 60000,
-    })
-    // navigator.geolocation.getCurrentPosition(function (position) {
-    //   const { latitude, longitude } = position.coords
-    //   map.centerAndZoom(new T.LngLat(longitude, latitude), 16)
-    //   if (props.defaultLnglat) {
-    //     addMarker(props.defaultLnglat)
-    //   }
-    //   loading.value = false
-    // }, function (error) {
-    //   console.error(error)
-    //   loading.value = false
-    // })
-  }
+    }
+    loading.value = false
+  }, {
+    enableHighAccuracy: true,
+    maximumAge: 10000,
+    timeout: 60000,
+  })
+  // navigator.geolocation.getCurrentPosition(function (position) {
+  //   const { latitude, longitude } = position.coords
+  //   map.centerAndZoom(new T.LngLat(longitude, latitude), 16)
+  //   if (props.defaultLnglat) {
+  //     addMarker(props.defaultLnglat)
+  //   }
+  //   loading.value = false
+  // }, function (error) {
+  //   console.error(error)
+  //   loading.value = false
+  // })
 })
 
 onUnmounted(() => {
@@ -78,7 +72,7 @@ function addMarker(lnglat: Lnglat) {
   map.panTo(new T.LngLat(lnglat.lng, lnglat.lat)) // 将地图中心点更改为标注的位置
 }
 
-function doChoose() {
+function onChoose() {
   if (!marker) {
     alert('请选择一个坐标点')
     return
@@ -86,25 +80,10 @@ function doChoose() {
   mapDialog.value!.close()
   emit('choose', marker.getLngLat())
 }
-
-function onClose() {
-  emit('close')
-}
 </script>
 
 <template>
-  <dialog ref="mapDialog" class="modal" @close="onClose">
-    <div class="modal-box">
-      <h3 class="font-bold text-lg">请选择一个坐标点</h3>
-      <div id="mapDiv" class=" h-96"></div>
-      <button class=" btn btn-primary mt-8" @click="doChoose">确认</button>
-      <div class="modal-action">
-        <form method="dialog">
-          <button class="btn">关闭</button>
-        </form>
-      </div>
-    </div>
-  </dialog>
+  <div id="mapDiv" class=" h-full"></div>
 </template>
 
 <style scoped></style>
