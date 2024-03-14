@@ -90,6 +90,9 @@ const onScrollToBottom = () => {
 </template>
 
 <style scoped>
+.chat-box {
+  height: calc(100% - 4rem);
+}
 .chat {
   margin-bottom: 1rem;
 }

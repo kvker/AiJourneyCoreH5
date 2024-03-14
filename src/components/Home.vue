@@ -22,11 +22,15 @@ function clean() {
 </script>
 
 <template>
-  <div class="w-full h-full">
+  <div class="home-container w-full h-full">
     <p @click="clean">
       当前景区：{{ attraction?.name }}
     </p>
   </div>
 </template>
 
-<style></style>
+<style scoped>
+.home-container {
+  height: calc(100% - 4rem);
+}
+</style>

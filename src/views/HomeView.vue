@@ -2,11 +2,12 @@
 import { ref, } from 'vue'
 import InitialForm from '@/components/InitialForm.vue'
 import Tabbar from '@/components/Common/Tabbar.vue'
+import router from '@/router'
 
 const inititalFormed = ref(!!localStorage.getItem('inititalFormed'))
 
 const onChangeTabbarItem = ({ index }: { index: number }) => {
-  console.log(index)
+  router.push(import.meta.env.BASE_URL + ['', 'chat'][index])
 }
 </script>
 
