@@ -15,19 +15,19 @@ function onChangeTabbarItem({ index }: { index: number }) {
 </script>
 
 <template>
-  <main class=" main-container">
+  <main class=" main-container h-full">
     <router-view v-slot="{ Component }">
       <keep-alive>
         <component :is="Component" />
       </keep-alive>
     </router-view>
   </main>
-  <Tabbar @change="onChangeTabbarItem" />
+  <!-- <Tabbar @change="onChangeTabbarItem" /> -->
 </template>
 
 <style>
 /* 表格的底部横线处理掉 */
 .main-container {
-  height: calc(100% - 4rem);
+  /* height: calc(100% - 4rem); */
 }
 </style>

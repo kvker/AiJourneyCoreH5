@@ -43,6 +43,11 @@ const router = createRouter({
       },
       children: [
         {
+          path: '', // 默认子路由，重定向到total
+          name: 'Home',
+          component: () => import('@/components/Home.vue')
+        },
+        {
           path: 'chat',
           component: () => import('@/components/Chat.vue')
         },
