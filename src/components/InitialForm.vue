@@ -14,6 +14,7 @@ const listBox: Ref<HTMLDivElement | undefined> = ref()
 type Message = GLMMessage & { answers?: string[], imageList?: string[] }
 type ChatList = Message[]
 
+const isTyping = ref(false)
 const askList: ChatList = [
   {
     role: 'assistant',
@@ -57,7 +58,7 @@ const initialForm: InitialForm = {
 }
 const chatList: Ref<ChatList> = ref([])
 
-function sleep(ms: number = 1000) {
+function sleep(ms: number = Math.random() * 2000 + 1000) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
@@ -65,19 +66,27 @@ function onCreateAsk() {
   const answerIndex = 4
   const chatLength = chatList.value.length
   const ask = askList[chatLength > answerIndex ? chatLength - 1 : chatLength]
+  // 追加了选择后数字加2
   if (chatLength === answerIndex + 2) {
     ask.content += initialForm.state
   }
   chatList.value.push(ask)
-  sleep().then(() => {
-    if (chatLength === answerIndex) {
-      onRenderAnswers()
-    } else if (chatLength >= askList.length) {
+  const isCreate = !(chatLength === answerIndex || chatLength >= askList.length)
+  if (isCreate) setTimeout(function () { isTyping.value = true }, 300)
+  if (chatLength === answerIndex) { // 让选择那一句
+    isTyping.value = false
+    onRenderAnswers()
+  } else if (chatLength >= askList.length) {
+    isTyping.value = false
+    sleep().then(() => {
       onEnd()
-    } else {
+    })
+  } else {
+    sleep().then(() => {
+      isTyping.value = false
       onCreateAsk()
-    }
-  })
+    })
+  }
   onScrollToBottom()
 }
 
@@ -93,9 +102,7 @@ function onRenderAnswers() {
 function onSelectAnswer(answer: string, index: number) {
   initialForm.state = answer
   selectAnswerIndex.value = index
-  sleep().then(() => {
-    onCreateAsk()
-  })
+  onCreateAsk()
 }
 
 function onScrollToBottom() {
@@ -146,6 +153,7 @@ function onEnd() {
           </div>
         </div>
       </template>
+      <p v-if="isTyping">正在输入中...</p>
     </div>
   </div>
 </template>
