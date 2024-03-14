@@ -9,10 +9,10 @@ document.addEventListener('login', () => {
   db.collection('JAttraction').doc('65bdf3579beccb0820f313ad').get()
     .then(({ data }: { data: Attraction[] }) => {
       attraction.value = data[0]
+      document.title = attraction.value.name
       localStorage.setItem('attraction', JSON.stringify(attraction.value))
     })
 })
-
 </script>
 
 <template>

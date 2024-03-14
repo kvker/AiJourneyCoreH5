@@ -8,9 +8,9 @@ export const db = app.database()
 
 export async function onLoginAnonymous() {
   // 调用匿名登录接口
-  await auth.anonymousAuthProvider().signIn()
+  const ret = await auth.anonymousAuthProvider().signIn()
   // 匿名登录成功后，登录状态isAnonymous字段值为true
-  const loginState = await auth.getLoginState()
+  // const loginState = await auth.getLoginState()
   // console.log(loginState.isAnonymousAuth) // true
   document.dispatchEvent(new Event('login'))
 }
