@@ -15,15 +15,9 @@ document.addEventListener('login', () => {
     })
 })
 
-// TODO 测试用
-function clean() {
-  localStorage.removeItem('inititalForm')
-  localStorage.removeItem('inititalFormed')
-}
-
 // 地图
 const dialogMapVisible = ref(false)
-const defaultLnglat = ref({ lng: 116.397428, lat: 39.90923 })
+const defaultLnglat = ref(null)
 function onChooseLnglat(lnglat: Lnglat) {
   console.log(lnglat)
 }
