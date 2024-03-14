@@ -16,4 +16,14 @@ app.config.errorHandler = (err, instance, info) => {
   console.log(err, instance, info)
 }
 
+if(process.env.NODE_ENV === 'development') {
+  const s=document.createElement('script')
+  s.src = '//cdn.bootcdn.net/ajax/libs/eruda/2.3.3/eruda.js'
+  document.body.append(s)
+  s.onload = () => {
+    // @ts-ignore
+    window.eruda.init()
+  }
+}
+
 app.mount('#app')

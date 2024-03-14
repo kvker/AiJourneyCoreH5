@@ -13,4 +13,6 @@ provide(UiStatusMapKey, ref({
   <RouterView />
 </template>
 
-<style></style>
+<style>
+
+</style>
