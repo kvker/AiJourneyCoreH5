@@ -126,7 +126,7 @@ function onEnd() {
 </script>
 
 <template>
-  <div class="chat-box fixed w-full h-full left-0 top-0 bg-white shadow-2xl p-4 flex flex-col"
+  <div class="chat-box fixed z-10 w-full h-full left-0 top-0 bg-white shadow-2xl p-4 flex flex-col"
     :class="{ 'end-animation': isEnd }">
     <div class="flex-1 chat-list-box w-full overflow-y-scroll" ref="listBox">
       <template v-for="(chat, index) of chatList" :key="index">
@@ -164,29 +164,29 @@ function onEnd() {
 </template>
 
 <style scoped>
-@keyframes endAni {
+@keyframes end {
   0% {
-    transform: scale(1) translateY(0);
+    transform: scale(1) translate(0, 0);
     opacity: 1;
   }
 
   40% {
-    transform: scale(0.1) translateY(0);
+    transform: scale(0.1) translate(0, 0);
     opacity: 1;
   }
 
-  80% {
-    transform: scale(0.1) translateY(500vh);
+  60% {
+    transform: scale(0.1) translate(250vw, 0);
     opacity: 1;
   }
 
   100% {
-    transform: scale(0.1) translateY(500vh);
+    transform: scale(0.1) translate(250vw, 500vh);
     opacity: 0;
   }
 }
 
 .end-animation {
-  animation: endAni 2000ms ease-in-out forwards;
+  animation: end 2s ease-in-out forwards;
 }
 </style>
