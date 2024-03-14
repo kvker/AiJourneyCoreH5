@@ -14,4 +14,4 @@ const inititalFormed = ref(!!localStorage.getItem('inititalFormed'))
   <InitialForm v-if="!inititalFormed" @formed="inititalFormed = true" />
 </template>
 
-<style></style>
+<style scoped></style>

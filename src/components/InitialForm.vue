@@ -114,15 +114,20 @@ function onScrollToBottom() {
 onCreateAsk()
 
 // 结束
+const isEnd = ref(false)
 function onEnd() {
   localStorage.setItem('inititalFormed', 'true')
   localStorage.setItem('inititalForm', JSON.stringify(initialForm))
-  emit('formed')
+  isEnd.value = true
+  setTimeout(function () {
+    emit('formed')
+  }, 3000)
 }
 </script>
 
 <template>
-  <div class="chat-box fixed w-full h-full left-0 top-0 bg-white shadow-2xl p-4 h-full flex flex-col">
+  <div class="chat-box fixed w-full h-full left-0 top-0 bg-white shadow-2xl p-4 flex flex-col"
+    :class="{ 'end-animation': isEnd }">
     <div class="flex-1 chat-list-box w-full overflow-y-scroll" ref="listBox">
       <template v-for="(chat, index) of chatList" :key="index">
         <div v-if="chat.role === 'assistant'" class="chat chat-start">
@@ -158,4 +163,30 @@ function onEnd() {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+@keyframes endAni {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  40% {
+    transform: scale(0.1) translateY(0);
+    opacity: 1;
+  }
+
+  80% {
+    transform: scale(0.1) translateY(500vh);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.1) translateY(500vh);
+    opacity: 0;
+  }
+}
+
+.end-animation {
+  animation: endAni 2000ms ease-in-out forwards;
+}
+</style>
