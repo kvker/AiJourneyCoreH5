@@ -15,17 +15,11 @@ document.addEventListener('login', () => {
     })
 })
 
-// 地图
-const dialogMapVisible = ref(false)
-const defaultLnglat = ref(null)
-function onChooseLnglat(lnglat: Lnglat) {
-  console.log(lnglat)
-}
 </script>
 
 <template>
   <div class="home-container">
-    <Map :visible="dialogMapVisible" :defaultLnglat="defaultLnglat" @choose="onChooseLnglat" />
+    <Map />
   </div>
 </template>
 

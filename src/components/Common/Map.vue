@@ -4,25 +4,20 @@ import type { Ref } from 'vue'
 
 let map: any
   , marker: any
-  , lo: any
-const emit = defineEmits(['choose', 'close'])
 const props = defineProps({
-  visible: Boolean,
   defaultLnglat: {
     type: Object as () => Lnglat | null,
     default: null,
   },
 })
 const loading = ref(false)
-const mapDialog: Ref<HTMLDialogElement | undefined> = ref()
 
 onMounted(() => {
   // 地图
   map = new T.Map('mapDiv')
   map.addEventListener("click", onMapClick)
-  lo = new T.Geolocation()
 
-  lo.getCurrentPosition(function (this: any, e: any) {
+  new T.Geolocation().getCurrentPosition(function (this: any, e: any) {
     if (this.getStatus() == 0) {
       map.centerAndZoom(e.lnglat, 15)
       if (props.defaultLnglat) {
@@ -59,7 +54,6 @@ onUnmounted(() => {
 })
 
 function onMapClick({ lnglat }: { lnglat: Lnglat }) {
-  // emit('choose', e.lnglat)
   addMarker(lnglat)
 }
 
@@ -77,8 +71,6 @@ function onChoose() {
     alert('请选择一个坐标点')
     return
   }
-  mapDialog.value!.close()
-  emit('choose', marker.getLngLat())
 }
 </script>
 
