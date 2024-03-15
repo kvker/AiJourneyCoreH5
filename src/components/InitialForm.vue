@@ -164,6 +164,10 @@ function onEnd() {
 </template>
 
 <style scoped>
+.chat-box {
+  /* 1000在地图那边 */
+  z-index: 2000;
+}
 @keyframes end {
   0% {
     transform: scale(1) translate(0, 0);
