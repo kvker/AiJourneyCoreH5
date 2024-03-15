@@ -91,7 +91,11 @@ function onChoose() {
 </script>
 
 <template>
-  <div id="mapDiv" class=" h-full"></div>
+  <div id="mapDiv" class=""></div>
 </template>
 
-<style scoped></style>
+<style scoped>
+#mapDiv {
+  height: 100vh;
+}
+</style>

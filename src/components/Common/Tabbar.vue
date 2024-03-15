@@ -31,4 +31,9 @@ function onClickTabbarItem(index: number) {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.btm-nav {
+  /* 1000在地图 */
+  z-index: 1002;
+}
+</style>
