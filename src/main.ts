@@ -5,9 +5,16 @@ import "tailwindcss/tailwind.css"
 import "@/styles/main.css"
 import App from './App.vue'
 import router from './router'
-import { onLoginAnonymous } from '@/services/cloud'
+import { onLoginAnonymous, onCheckExpired } from '@/services/cloud'
 
-onLoginAnonymous()
+try {
+  onLoginAnonymous()
+} catch (e) {
+  onCheckExpired(() => {
+    alert('登录过期，自动重新登录')
+    onLoginAnonymous()
+  })
+}
 
 const app = createApp(App)
 app.use(createPinia())

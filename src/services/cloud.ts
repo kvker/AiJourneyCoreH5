@@ -4,6 +4,15 @@ export const app = cloudbase.init({
 export const auth = app.auth({
   persistence: "local" //用户显式退出或更改密码之前的30天一直有效
 })
+
+export const onCheckExpired = (cb: Function) => {
+  auth.onLoginStateExpired(() => {
+    // 此时登录状态过期，需要重新登录
+    auth.signOut() // 先清空数据
+    cb && cb()
+  })
+}
+
 export const db = app.database()
 
 export async function onLoginAnonymous() {
