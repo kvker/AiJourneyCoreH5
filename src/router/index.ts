@@ -17,10 +17,6 @@ const router = createRouter({
           path: 'chat',
           component: () => import('@/components/Chat.vue')
         },
-        {
-          path: 'mine',
-          component: () => import('@/components/Mine.vue')
-        },
       ]
     },
   ]
