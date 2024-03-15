@@ -32,7 +32,7 @@ document.addEventListener('login', () => {
 
 <template>
   <div class="home-container">
-    <Map v-if="attraction" />
+    <Map v-if="attraction" :attraction="attraction" />
   </div>
 </template>
 
