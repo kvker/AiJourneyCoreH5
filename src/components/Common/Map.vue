@@ -7,6 +7,7 @@ const collection = db.collection('JArea')
 
 let map: any
   , marker: any
+  , label: any
 const props = defineProps({
   defaultLnglat: {
     type: Object as () => Lnglat | null,
@@ -62,7 +63,6 @@ async function getAreaList() {
     attractionId: props.attraction._id,
   }).limit(100).get()
   map.panTo(new T.LngLat(props.attraction.lnglat.longitude, props.attraction.lnglat.latitude))
-  console.log(data)
   onRenderAreaList(data)
 }
 
@@ -86,7 +86,7 @@ function onAddMarker(lnglat: Lnglat) {
 }
 
 function onAddLabel(item: Area) {
-  const label = new T.Label({
+  label = new T.Label({
     text: item.name,
     position: new T.LngLat(item.lnglat.longitude, item.lnglat.latitude),
     offset: new T.Point(-9, 0)
