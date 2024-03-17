@@ -29,7 +29,7 @@ onMounted(() => {
     const status = this.getStatus()
     console.log('地图获取状态：' + status)
     if (status < 2) {
-      map.centerAndZoom(e.lnglat, 16)
+      map.centerAndZoom(e.lnglat, 17)
       if (props.defaultLnglat) {
         onAddMarker(props.defaultLnglat)
       }
@@ -41,17 +41,6 @@ onMounted(() => {
     maximumAge: 10000,
     timeout: 60000,
   })
-  // navigator.geolocation.getCurrentPosition(function (position) {
-  //   const { latitude, longitude } = position.coords
-  //   map.centerAndZoom(new T.LngLat(longitude, latitude), 16)
-  //   if (props.defaultLnglat) {
-  //     onAddMarker(props.defaultLnglat)
-  //   }
-  //   loading.value = false
-  // }, function (error) {
-  //   console.error(error)
-  //   loading.value = false
-  // })
 })
 
 onUnmounted(() => {
@@ -70,10 +59,6 @@ function onRenderAreaList(data: Area[]) {
   data.forEach((item: Area) => {
     onAddLabel(item)
   })
-}
-
-function onMapClick({ lnglat }: { lnglat: Lnglat }) {
-  // onAddMarker(lnglat)
 }
 
 function onAddMarker(lnglat: Lnglat) {
@@ -96,13 +81,6 @@ function onAddLabel(item: Area) {
   label.addEventListener('click', function () {
     console.log('点击了' + item.name)
   })
-}
-
-function onChoose() {
-  if (!marker) {
-    alert('请选择一个坐标点')
-    return
-  }
 }
 </script>
 
