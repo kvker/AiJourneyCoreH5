@@ -20,6 +20,9 @@ const props = defineProps({
 })
 const loading = ref(false)
 
+let leftBottom = new T.LngLat(120.18664, 30.17085)
+let rightTop = new T.LngLat(120.19098, 30.1753)
+
 onMounted(() => {
   // 地图
   map = new T.Map('mapDiv')
@@ -29,11 +32,13 @@ onMounted(() => {
     const status = this.getStatus()
     console.log('地图获取状态：' + status)
     if (status < 2) {
-      map.centerAndZoom(e.lnglat, 17)
+      map.centerAndZoom(e.lnglat, 18)
+      map.setMaxBounds(new T.LngLatBounds(leftBottom, rightTop))
       if (props.defaultLnglat) {
         onAddMarker(props.defaultLnglat)
       }
       getAreaList()
+      onRenderDrawMap()
     }
     loading.value = false
   }, {
@@ -71,16 +76,27 @@ function onAddMarker(lnglat: Lnglat) {
 }
 
 function onAddLabel(item: Area) {
-  label = new T.Label({
-    text: item.name,
-    position: new T.LngLat(item.lnglat.longitude, item.lnglat.latitude),
-    offset: new T.Point(-9, 0)
+  // label = new T.Label({
+  //   text: item.name,
+  //   position: new T.LngLat(item.lnglat.longitude, item.lnglat.latitude),
+  //   offset: new T.Point(-9, 0)
+  // })
+  // //创建地图文本对象
+  // map.addOverLay(label)
+  // label.addEventListener('click', function () {
+  //   console.log('点击了' + item.name)
+  // })
+}
+
+function onRenderDrawMap() {
+  const bd = new T.LngLatBounds(
+    leftBottom,
+    rightTop)
+  const img = new T.ImageOverlay("https://6169-ai-tools-6guwawtsb724a7e7-1254288091.tcb.qcloud.la/images/changhelaojie/handDrawMap.png?sign=0992f6947aba9e9928ecbba881893ab9&t=1710771342", bd, {
+    opacity: 1,
+    alt: "长河老街"
   })
-  //创建地图文本对象
-  map.addOverLay(label)
-  label.addEventListener('click', function () {
-    console.log('点击了' + item.name)
-  })
+  map.addOverLay(img)
 }
 </script>
 
