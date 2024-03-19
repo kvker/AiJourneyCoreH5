@@ -21,7 +21,13 @@ export async function onCompletions(content: string | GLMMessage[], SseCB: LlmCb
 let controller: AbortController
 async function onFetchStream(messages: GLMMessage[]) {
   const raw = JSON.stringify({
-    messages: [{role: 'system', content: '你是长河老街的专属AI智能导游，名字叫来来。是对这里最最熟悉的人，很愿意回答关于长河老街的问题。'}, ...messages],
+    messages: [{ role: 'system', content: '你是长河老街的专属AI智能导游，名字叫来来。是对这里最最熟悉的人，很愿意回答关于长河老街的问题。' }, ...messages],
+    "tools": [{
+      "type": "retrieval",
+      "retrieval": {
+        "knowledge_id": "1768553804254646272"
+      }
+    }]
   })
 
   controller = new AbortController()
