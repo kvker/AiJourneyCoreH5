@@ -31,7 +31,7 @@ const askList: ChatList = [
   {
     role: 'assistant',
     content: '',
-    imageList: ['https://sablcfile.kvker.com/5okMURHx2lMDwPSBf4swxkVFxtRx7OXa/1701318337.817.png'],
+    imageList: ['/images/welcome-ip.png'],
   },
   {
     role: 'assistant',
@@ -133,22 +133,16 @@ function onEnd() {
         <div v-if="chat.role === 'assistant'" class="chat chat-start">
           <div class="chat-image avatar">
             <div class="w-10 rounded-full">
-              <img alt="Tailwind CSS chat bubble component"
-                src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+              <img alt="Tailwind CSS chat bubble component" src="/images/avatar.png" />
             </div>
           </div>
           <div v-if="chat.content" class="chat-bubble">{{ chat.content }}</div>
           <template v-else-if="chat.imageList && chat.imageList.length">
-            <img v-for="url of chat.imageList" :key="url" class="w-32 h-32 object-contain" :src="url">
+            <img v-for="url of chat.imageList" :key="url" class="w-48 h-48 object-contain" :src="url">
           </template>
         </div>
         <div v-else class="chat chat-end">
-          <div class="chat-image avatar">
-            <div class="w-10 rounded-full">
-              <img alt="Tailwind CSS chat bubble component"
-                src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-            </div>
-          </div>
+          <p class=" text-slate-300 text-sm mb-2">选择你的答案</p>
           <div class="chat-bubble">
             <button class="btn btn-accent btn-sm mx-1"
               :class="selectAnswerIndex === index ? 'btn-secondary' : 'btn-outline'"
@@ -168,6 +162,7 @@ function onEnd() {
   /* 1000在地图那边 */
   z-index: 2000;
 }
+
 @keyframes end {
   0% {
     transform: scale(1) translate(0, 0);
