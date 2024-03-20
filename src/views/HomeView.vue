@@ -27,12 +27,14 @@ const onChangeTabbarItem = ({ index }: { index: number }) => {
 </script>
 
 <template>
-  <router-view v-slot="{ Component }">
-    <keep-alive v-if="id">
-      <component :is="Component" />
-    </keep-alive>
-  </router-view>
-  <InitialForm v-if="id && !inititalFormed" @formed="inititalFormed = true" />
+  <template v-if="id">
+    <router-view v-slot="{ Component }">
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
+    <InitialForm v-if="!inititalFormed" @formed="inititalFormed = true" />
+  </template>
   <Tabbar @change="onChangeTabbarItem" />
 </template>
 
