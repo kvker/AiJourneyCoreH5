@@ -25,7 +25,6 @@ const props = defineProps({
 
 let leftBottom = new T.LngLat(120.18664, 30.17085)
 let rightTop = new T.LngLat(120.19098, 30.1753)
-const attraction: Attraction = JSON.parse(localStorage.getItem('attraction') as string)
 
 onMounted(() => {
   // 地图
@@ -33,7 +32,7 @@ onMounted(() => {
 
   onLocation().then((ll) => {
     onRenderDrawMap()
-    map.centerAndZoom(lnglat2Ll(attraction.lnglat), defaultZoom)
+    map.centerAndZoom(lnglat2Ll(props.attraction.lnglat), defaultZoom)
     // map.setMaxBounds(new T.LngLatBounds(leftBottom, rightTop))
     if (props.defaultLnglat) {
       onAddMarker(props.defaultLnglat)
@@ -61,6 +60,12 @@ function onLocation(): Promise<LL> {
   })
 }
 
+function onLocationSelf() {
+  onLocation().then(ll => {
+    map.centerAndZoom(ll, defaultZoom)
+  })
+}
+
 function onAutoLocation() {
   setTimeout(() => {
     onLocation().then(ll => {
@@ -68,20 +73,6 @@ function onAutoLocation() {
       onAutoLocation()
     })
   }, 3000)
-}
-
-async function getAreaList() {
-  const { data } = await collection.where({
-    attractionId: props.attraction._id,
-  }).limit(100).get()
-  map.panTo(new T.LngLat(props.attraction.lnglat.longitude, props.attraction.lnglat.latitude))
-  onRenderAreaList(data)
-}
-
-function onRenderAreaList(data: Area[]) {
-  data.forEach((item: Area) => {
-    onAddLabel(item)
-  })
 }
 
 function onAddMarker(lnglat: Lnglat, handleMarker = marker) {
@@ -98,24 +89,16 @@ function onUpdateMarker(lnglat: Lnglat, handleMarker: any) {
 }
 
 function onAddLabel(item: Area) {
-  // label = new T.Label({
-  //   text: item.name,
-  //   position: new T.LngLat(item.lnglat.longitude, item.lnglat.latitude),
-  //   offset: new T.Point(-9, 0)
-  // })
-  // //创建地图文本对象
-  // map.addOverLay(label)
-  // label.addEventListener('click', function () {
-  //   console.log('点击了' + item.name)
-  // })
-  // const lnglat = item.lnglat
-  // const infoWin = new T.InfoWindow()
-  // infoWin.setContent(`<p class="sdakfjlaskdjlskfdjsdflkj">${item.name}</p>`)
-  // marker = new T.Marker(new T.LngLat(lnglat.longitude, lnglat.latitude)) // 创建标注
-  // map.addOverLay(marker) // 将标注添加到地图中
-  // marker.addEventListener("click", function () {
-  //   marker.openInfoWindow(infoWin)
-  // })
+  const label = new T.Label({
+    text: item.name,
+    position: new T.LngLat(item.lnglat.longitude, item.lnglat.latitude),
+    offset: new T.Point(-9, 0)
+  })
+  //创建地图文本对象
+  map.addOverLay(label)
+  label.addEventListener('click', function () {
+    console.log('点击了' + item.name)
+  })
 }
 
 function onRenderDrawMap() {
@@ -128,14 +111,70 @@ function onRenderDrawMap() {
   })
   map.addOverLay(img)
 }
+
+// 列表处理
+const areaList: Ref<Area[]> = ref([])
+async function getAreaList() {
+  const { data } = await collection.where({
+    attractionId: props.attraction._id,
+  }).limit(100).get()
+  map.panTo(new T.LngLat(props.attraction.lnglat.longitude, props.attraction.lnglat.latitude))
+  onRenderAreaList(data)
+  areaList.value = data
+}
+
+function onRenderAreaList(data: Area[]) {
+  data.forEach((item: Area) => {
+    onAddLabel(item)
+  })
+}
+
+function miniImage(url: string) {
+  if (url.includes('?')) return url + '&imageView2/2/h/80'
+  else return url += '?imageView2/2/h/80'
+}
+
+// 讲解区域
+const autoPlay = ref(false)
+function onChangeAuto() {
+  autoPlay.value = !autoPlay.value
+}
 </script>
 
 <template>
   <div id="mapDiv" class=""></div>
+  <button class="location-button btn btn-primary btn-sm top-8 right-2" :disabled="autoPlay"
+    @click="onLocationSelf">定位当前</button>
+  <div class="area-list w-full left-0 bottom-16">
+    <div class="w-24 bg-white rounded-lg flex flex-col items-center justify-center ml-auto mr-2 mb-2"
+      :class="autoPlay ? 'bottom-64' : 'bottom-20'">
+      <label class="cursor-pointer label">
+        <input type="checkbox" class="toggle toggle-primary" @change="onChangeAuto" />
+      </label>
+      <p class="text-xs">自动讲解</p>
+    </div>
+    <ul v-show="!autoPlay" class="bg-white w-full h-48 overflow-y-scroll">
+      <li v-for="item in areaList" :key="item._id" class="flex items-center justify-between p-2">
+        <img class="w-12 h-12 rounded-full" :src="miniImage(item.coverImageList[0])" alt="cover-image">
+        <section class="info flex-1 ml-2">
+          <h3 class=" text-base">{{ item.name }}</h3>
+          <p class=" text-gray-400 text-xs">{{ item.name }}</p>
+        </section>
+        <img class=" w-6 h-6" src="/icons/audio.png" alt="audio">
+      </li>
+    </ul>
+  </div>
+
 </template>
 
 <style scoped>
 #mapDiv {
   height: 100vh;
+}
+
+.location-button,
+.area-list {
+  position: fixed;
+  z-index: 1001;
 }
 </style>
