@@ -145,7 +145,8 @@ function onChangeAuto() {
   <div id="mapDiv" class=""></div>
   <button class="location-button btn btn-primary btn-sm top-8 right-2" :disabled="autoPlay"
     @click="onLocationSelf">定位当前</button>
-  <div class="area-list w-full left-0 bottom-16">
+  <div class="area-list w-full left-0 bottom-16 translate-y-0 transition-transform"
+    :class="autoPlay ? 'translate-y-48' : 'translate-y-0'">
     <div class="w-24 bg-white rounded-lg flex flex-col items-center justify-center ml-auto mr-2 mb-2"
       :class="autoPlay ? 'bottom-64' : 'bottom-20'">
       <label class="cursor-pointer label">
@@ -153,7 +154,7 @@ function onChangeAuto() {
       </label>
       <p class="text-xs">自动讲解</p>
     </div>
-    <ul v-show="!autoPlay" class="bg-white w-full h-48 overflow-y-scroll">
+    <ul class="bg-white w-full h-48 overflow-y-scroll">
       <li v-for="item in areaList" :key="item._id" class="flex items-center justify-between p-2">
         <img class="w-12 h-12 rounded-full" :src="miniImage(item.coverImageList[0])" alt="cover-image">
         <section class="info flex-1 ml-2">
