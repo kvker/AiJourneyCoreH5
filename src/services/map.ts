@@ -1,16 +1,21 @@
 const TmKey = '7679c343623ec0339bd308138c672120' // 天地图的 key
 
-export function ll2Lnglat(ll: LL) {
+/**
+ *
+ * @param ll {lng, lat}
+ * @returns lnglat {longitude, latitude}
+ */
+export function ll2Lnglat(ll: LL): Lnglat {
   return {
-    lng: ll.longitude,
-    lat: ll.latitude,
+    longitude: ll.lng,
+    latitude: ll.lat,
   }
 }
 
-export function lnglat2Ll(lnglat: Lnglat) {
+export function lnglat2Ll(lnglat: Lnglat): LL {
   return {
-    longitude: lnglat.longitude,
-    latitude: lnglat.latitude,
+    lng: lnglat.longitude,
+    lat: lnglat.latitude,
   }
 }
 

@@ -1,13 +1,17 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import type { Ref } from 'vue'
+import { lnglat2Ll } from '@/services/map'
 import { db } from '@/services/cloud'
+import { ll2Lnglat } from '@/services/map';
 
 const collection = db.collection('JArea')
 
 let map: any
   , marker: any
+  , markerSelf: any
   , label: any
+  , defaultZoom = 18
 const props = defineProps({
   defaultLnglat: {
     type: Object as () => Lnglat | null,
@@ -18,39 +22,53 @@ const props = defineProps({
     required: true,
   },
 })
-const loading = ref(false)
 
 let leftBottom = new T.LngLat(120.18664, 30.17085)
 let rightTop = new T.LngLat(120.19098, 30.1753)
+const attraction: Attraction = JSON.parse(localStorage.getItem('attraction') as string)
 
 onMounted(() => {
   // 地图
   map = new T.Map('mapDiv')
-  // map.addEventListener("click", onMapClick)
 
-  new T.Geolocation().getCurrentPosition(function (this: any, e: any) {
-    const status = this.getStatus()
-    console.log('地图获取状态：' + status)
-    if (status < 2) {
-      map.centerAndZoom(e.lnglat, 18)
-      map.setMaxBounds(new T.LngLatBounds(leftBottom, rightTop))
-      if (props.defaultLnglat) {
-        onAddMarker(props.defaultLnglat)
-      }
-      getAreaList()
-      onRenderDrawMap()
+  onLocation().then((ll) => {
+    onRenderDrawMap()
+    map.centerAndZoom(lnglat2Ll(attraction.lnglat), defaultZoom)
+    // map.setMaxBounds(new T.LngLatBounds(leftBottom, rightTop))
+    if (props.defaultLnglat) {
+      onAddMarker(props.defaultLnglat)
     }
-    loading.value = false
-  }, {
-    enableHighAccuracy: true,
-    maximumAge: 10000,
-    timeout: 60000,
+    getAreaList()
+    onAutoLocation()
   })
 })
 
-onUnmounted(() => {
-  // map.removeEventListener("click", onMapClick)
-})
+function onLocation(): Promise<LL> {
+  return new Promise((s, j) => {
+    new T.Geolocation().getCurrentPosition(function (this: any, e: any) {
+      const status = this.getStatus()
+      // console.log('地图获取状态：' + status)
+      if (status < 2) {
+        s(e.lnglat)
+      } else {
+        j(false)
+      }
+    }, {
+      enableHighAccuracy: true,
+      maximumAge: 10000,
+      timeout: 60000,
+    })
+  })
+}
+
+function onAutoLocation() {
+  setTimeout(() => {
+    onLocation().then(ll => {
+      markerSelf = onUpdateMarker(ll2Lnglat(ll), markerSelf)
+      onAutoLocation()
+    })
+  }, 3000)
+}
 
 async function getAreaList() {
   const { data } = await collection.where({
@@ -66,13 +84,17 @@ function onRenderAreaList(data: Area[]) {
   })
 }
 
-function onAddMarker(lnglat: Lnglat) {
-  // if (marker) {
-  //   map.removeOverLay(marker) // 移除标注
-  // }
-  marker = new T.Marker(new T.LngLat(lnglat.longitude, lnglat.latitude)) // 创建标注
-  map.addOverLay(marker) // 将标注添加到地图中
-  map.panTo(new T.LngLat(lnglat.longitude, lnglat.latitude)) // 将地图中心点更改为标注的位置
+function onAddMarker(lnglat: Lnglat, handleMarker = marker) {
+  handleMarker = new T.Marker(new T.LngLat(lnglat.longitude, lnglat.latitude)) // 创建标注
+  map.addOverLay(handleMarker) // 将标注添加到地图中
+  return handleMarker
+}
+
+function onUpdateMarker(lnglat: Lnglat, handleMarker: any) {
+  if (handleMarker) handleMarker.setLngLat(new T.LngLat(lnglat.longitude, lnglat.latitude))
+  else handleMarker = onAddMarker(lnglat, handleMarker)
+  // map.centerAndZoom(lnglat2Ll(lnglat), defaultZoom) // 跟踪位置
+  return handleMarker
 }
 
 function onAddLabel(item: Area) {
@@ -85,6 +107,14 @@ function onAddLabel(item: Area) {
   // map.addOverLay(label)
   // label.addEventListener('click', function () {
   //   console.log('点击了' + item.name)
+  // })
+  // const lnglat = item.lnglat
+  // const infoWin = new T.InfoWindow()
+  // infoWin.setContent(`<p class="sdakfjlaskdjlskfdjsdflkj">${item.name}</p>`)
+  // marker = new T.Marker(new T.LngLat(lnglat.longitude, lnglat.latitude)) // 创建标注
+  // map.addOverLay(marker) // 将标注添加到地图中
+  // marker.addEventListener("click", function () {
+  //   marker.openInfoWindow(infoWin)
   // })
 }
 

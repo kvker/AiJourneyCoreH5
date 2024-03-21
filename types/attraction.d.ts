@@ -1,11 +1,12 @@
 declare const T: any
-type LL = {
-  longitude: number
-  latitude: number
-}
+
 type Lnglat = {
   longitude: number
   latitude: number
+}
+type LL = {
+  lng: number
+  lat: number
 }
 
 type CloudItem = {
