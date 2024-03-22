@@ -25,7 +25,7 @@ app.config.errorHandler = (err, instance, info) => {
   console.log(err, instance, info)
 }
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development' && location.hostname.includes('192.168')) {
   const s = document.createElement('script')
   s.src = '//cdn.bootcdn.net/ajax/libs/eruda/2.3.3/eruda.js'
   document.body.append(s)
