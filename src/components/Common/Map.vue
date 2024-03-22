@@ -68,9 +68,12 @@ function onLocationSelf() {
 
 function onAutoLocation() {
   setTimeout(() => {
+    onAutoLocation()
+    if (!autoPlay.value) return
     onLocation().then(ll => {
-      markerSelf = onUpdateMarker(ll2Lnglat(ll), markerSelf)
-      onAutoLocation()
+      const lnglat = ll2Lnglat(ll)
+      markerSelf = onUpdateMarker(lnglat, markerSelf)
+      onAutoPlay(lnglat)
     })
   }, 3000)
 }
@@ -138,6 +141,26 @@ function miniImage(url: string) {
 const autoPlay = ref(false)
 function onChangeAuto() {
   autoPlay.value = !autoPlay.value
+}
+
+function onAutoPlay(lnglat: Lnglat) {
+  let minDistance = Infinity
+  let minArea: Area = areaList.value[0]
+  areaList.value.forEach((item: Area) => {
+    // 勾股定理开方
+    const distance = Math.sqrt(Math.pow(item.lnglat.longitude - lnglat.longitude, 2) + Math.pow(item.lnglat.latitude - lnglat.latitude, 2))
+    if (distance < minDistance) {
+      minDistance = distance
+      minArea = item
+    }
+  })
+  onPlay(minArea as Area)
+}
+
+function onPlay(area: Area) {
+  // TODO 播报处理
+  console.log('onPlay')
+  console.log(area)
 }
 </script>
 
