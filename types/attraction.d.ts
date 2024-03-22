@@ -1,5 +1,10 @@
 declare const T: any
 
+type Cloud<T> = {
+  data: T[]
+  requestId: string
+}
+
 type Lnglat = {
   longitude: number
   latitude: number
@@ -29,7 +34,7 @@ type Area = {
   lnglat: Lnglat
   name: string
   innerName: string // 内部使用名
-} & CloudItem
+} & CloudItem & { playState?: 'playing' | 'ended' | 'paused' }
 
 type AreaSearchParams = {
   name: string

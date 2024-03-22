@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, nextTick } from 'vue'
 import type { Ref } from 'vue'
 import { lnglat2Ll } from '@/services/map'
 import { db } from '@/services/cloud'
@@ -46,7 +46,6 @@ function onLocation(): Promise<LL> {
   return new Promise((s, j) => {
     new T.Geolocation().getCurrentPosition(function (this: any, e: any) {
       const status = this.getStatus()
-      // console.log('地图获取状态：' + status)
       if (status < 2) {
         s(e.lnglat)
       } else {
@@ -100,6 +99,7 @@ function onAddLabel(item: Area) {
   //创建地图文本对象
   map.addOverLay(label)
   label.addEventListener('click', function () {
+    console.log(item)
     console.log('点击了' + item.name)
   })
 }
@@ -139,14 +139,27 @@ function miniImage(url: string) {
 
 // 讲解区域
 const autoPlay = ref(false)
+const audio: Ref<HTMLAudioElement | null> = ref(null)
+const currentAudioSrc = ref('')
+
+onMounted(() => {
+  audio.value!.addEventListener('ended', e => {
+    console.log('语音自动讲解结束播完')
+    const currentPlayArea = areaList.value.find(i => i.playState === 'playing')
+    currentPlayArea && (currentPlayArea.playState = 'ended')
+  })
+})
+
 function onChangeAuto() {
   autoPlay.value = !autoPlay.value
+  if (!autoPlay.value && !audio.value!.paused) audio.value!.pause()
 }
 
 function onAutoPlay(lnglat: Lnglat) {
   let minDistance = Infinity
   let minArea: Area = areaList.value[0]
   areaList.value.forEach((item: Area) => {
+    if (item.playState === 'ended') return
     // 勾股定理开方
     const distance = Math.sqrt(Math.pow(item.lnglat.longitude - lnglat.longitude, 2) + Math.pow(item.lnglat.latitude - lnglat.latitude, 2))
     if (distance < minDistance) {
@@ -154,13 +167,31 @@ function onAutoPlay(lnglat: Lnglat) {
       minArea = item
     }
   })
-  onPlay(minArea as Area)
+  onPlay(minArea)
 }
 
-function onPlay(area: Area) {
-  // TODO 播报处理
-  console.log('onPlay')
-  console.log(area)
+async function onPlay(area: Area) {
+  const paused = audio.value!.paused
+  if (paused) {
+    const areaIntroduce = await getAreaIntroduce(area)
+    currentAudioSrc.value = areaIntroduce.voice
+    nextTick(() => {
+      area.playState = 'playing'
+      audio.value!.play()
+    })
+  }
+}
+
+async function getAreaIntroduce(area = areaList.value[0]) {
+  const chatStyleIndex = Number(localStorage.getItem('chatStyleIndex')) || 0
+  const { data }: Cloud<AreaIntroduce> = await db.collection('JAreaIntroduce').where({
+    areaId: area._id,
+    chatStyleId: ['65b4d24bfdf6021d30d61a57', '65b4d246fdf6021d30d61a56', '65b4d2587ac027333bc13ddd'][chatStyleIndex],
+  }).get()
+  const areaIntroduce = data[0]
+  console.log(areaIntroduce.introduce)
+  console.log('讲解内容')
+  return areaIntroduce
 }
 </script>
 
@@ -184,11 +215,12 @@ function onPlay(area: Area) {
           <h3 class=" text-base">{{ item.name }}</h3>
           <p class=" text-gray-400 text-xs">{{ item.name }}</p>
         </section>
-        <img class=" w-6 h-6" src="/icons/audio.png" alt="audio">
+        <img class=" w-6 h-6" :src="item.playState === 'ended' ? '/icons/audio.png' : '/icons/audio-disabled.png'"
+          alt="audio">
       </li>
     </ul>
   </div>
-
+  <audio ref="audio" :src="currentAudioSrc" class="audio-player fixed left-full"></audio>
 </template>
 
 <style scoped>
