@@ -51,7 +51,7 @@ const askList: ChatList = [
   },
 ]
 
-const answers = [['常规', '简洁', '慢速']]
+const answers = [['常规', '可爱', '严肃']]
 const selectAnswerIndex = ref(-1)
 const initialForm: InitialForm = {
   state: '常规',
@@ -103,6 +103,8 @@ function onSelectAnswer(answer: string, index: number) {
   initialForm.state = answer
   selectAnswerIndex.value = index
   onCreateAsk()
+  // 保存到本地
+  localStorage.setItem('chatStyleIndex', String(index))
 }
 
 function onScrollToBottom() {
