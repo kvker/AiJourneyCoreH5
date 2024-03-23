@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { ref, computed, watch, nextTick } from 'vue'
 import type { Ref } from 'vue'
-import { onCompletions } from '@/services/llm'
+import LLM from '@/services/llm'
+
+const llm = new LLM()
 
 // 对话模块
 const lastContent = ref('')
@@ -23,7 +25,7 @@ const onChat = async () => {
   if (lastChat && !isChating.value) {
     try {
       isChating.value = true
-      await onCompletions(chatList.value, (result) => {
+      await llm.onCompletions(chatList.value, (result) => {
         lastContent.value = result
         onScrollToBottom()
       }, done => {
@@ -79,9 +81,8 @@ const onScrollToBottom = () => {
       </div>
     </div>
     <div class="chat-input-box flex justify-between items-center mt-2">
-      <textarea class="textarea textarea-bordered textarea-sm flex-1"
-        :placeholder="isChating ? '等待 AI 输出完成' : '请聊点什么吧'" :disabled="isChating" ref="textarea"
-        @keydown.shift.enter="onSend"></textarea>
+      <textarea class="textarea textarea-bordered textarea-sm flex-1" :placeholder="isChating ? '等待 AI 输出完成' : '请聊点什么吧'"
+        :disabled="isChating" ref="textarea" @keydown.shift.enter="onSend"></textarea>
       <div class=" flex flex-col ml-4">
         <button class="btn btn-sm btn-primary" @click="onSend">发送</button>
       </div>
@@ -93,6 +94,7 @@ const onScrollToBottom = () => {
 .chat-box {
   height: calc(100% - 4rem);
 }
+
 .chat {
   margin-bottom: 1rem;
 }
