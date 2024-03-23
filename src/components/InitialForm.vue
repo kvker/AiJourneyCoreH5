@@ -11,7 +11,7 @@ type InitialForm = {
 // 对话模块
 const listBox: Ref<HTMLDivElement | undefined> = ref()
 
-type Message = GLMMessage & { answers?: string[], imageList?: string[] }
+type Message = GlmMessage & { answers?: string[], imageList?: string[] }
 type ChatList = Message[]
 
 const isTyping = ref(false)
