@@ -1,27 +1,13 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
-import type { Ref } from 'vue'
-import { db } from '@/services/cloud'
+import { ref } from 'vue'
 import Map from '@/components/Common/Map.vue'
 
-let id = localStorage.getItem('attractionId') as string
-
-const attraction: Ref<Attraction> = ref(JSON.parse(localStorage.getItem('attraction') as string))
-// 如果依赖用户登录（或匿名登录），则需要监听此事件
-document.addEventListener('login', () => {
-  db.collection('JAttraction').doc(id).get()
-    .then(({ data }: { data: Attraction[] }) => {
-      attraction.value = data[0]
-      document.title = attraction.value.name
-      localStorage.setItem('attraction', JSON.stringify(attraction.value))
-    })
-})
-
+const attractionRef = ref(JSON.parse(localStorage.getItem('attraction') as string))
 </script>
 
 <template>
   <div class="home-container">
-    <Map v-if="attraction" :attraction="attraction" />
+    <Map :attraction="attractionRef" />
   </div>
 </template>
 

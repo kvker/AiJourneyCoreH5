@@ -6,9 +6,11 @@ type LlmCb = (result: string) => void
 // JSON.parse(localStorage.getItem('attraction') as Attraction
 export default class LLM {
   controller: AbortController | undefined
+  knowledgeId: string
 
   constructor() {
-    console.log('LLM')
+    const attraction: Attraction = JSON.parse(localStorage.getItem('attraction') as string)
+    this.knowledgeId = attraction.knowledgeId as string
   }
 
   async onCompletions(content: string | GLMMessage[], SseCB: LlmCb, doneCb?: LlmCb) {
@@ -26,15 +28,18 @@ export default class LLM {
   }
 
   async onFetchStream(messages: GLMMessage[]) {
-    const raw = JSON.stringify({
+    const body: { messages: GLMMessage[], tools?: GlmTools[] } = {
       messages: [{ role: 'system', content: '你是长河老街的专属AI智能导游，名字叫来来。是对这里最最熟悉的人，很愿意回答关于长河老街的问题。' }, ...messages],
-      "tools": [{
-        "type": "retrieval",
-        "retrieval": {
-          "knowledge_id": '1768553804254646272'
+    }
+    if (this.knowledgeId) {
+      body.tools = [{
+        type: "retrieval",
+        retrieval: {
+          knowledge_id: this.knowledgeId,
         }
       }]
-    })
+    }
+    const raw = JSON.stringify(body)
 
     this.controller = new AbortController()
     const signal = this.controller.signal

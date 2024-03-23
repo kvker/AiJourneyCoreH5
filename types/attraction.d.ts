@@ -26,6 +26,7 @@ type Attraction = {
   ipList: url[]
   introduceVideo: string
   lnglat: Lnglat
+  knowledgeId: string
 } & CloudItem
 
 type Area = {
