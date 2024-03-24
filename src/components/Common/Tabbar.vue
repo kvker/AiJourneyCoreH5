@@ -1,10 +1,19 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue'
 import type { Ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { routes } from '@/router/index'
 
 const emit = defineEmits(['change'])
 
+const { name } = useRoute()
 const currentIndex = ref(0)
+
+routes[0].children.forEach((route, index) => {
+  if (route.name === name) {
+    currentIndex.value = index
+  }
+})
 
 function onClickTabbarItem(index: number) {
   currentIndex.value = index
