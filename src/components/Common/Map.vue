@@ -184,7 +184,7 @@ async function onPlay(area: Area) {
 
 async function getAreaIntroduce(area = areaList.value[0]) {
   const chatStyleIndex = Number(localStorage.getItem('chatStyleIndex')) || 0
-  const { data }: Cloud<AreaIntroduce> = await db.collection('JAreaIntroduce').where({
+  const { data }: CloudResponse<AreaIntroduce> = await db.collection('JAreaIntroduce').where({
     areaId: area._id,
     chatStyleId: ['65b4d24bfdf6021d30d61a57', '65b4d246fdf6021d30d61a56', '65b4d2587ac027333bc13ddd'][chatStyleIndex],
   }).get()

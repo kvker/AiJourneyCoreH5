@@ -1,6 +1,6 @@
 declare const T: any
 
-type Cloud<T> = {
+type CloudResponse<T> = {
   data: T[]
   requestId: string
 }
