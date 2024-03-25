@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, nextTick } from 'vue'
 import type { Ref } from 'vue'
-import { lnglat2Ll } from '@/services/map'
+import { lnglat2Ll, distance, ll2Lnglat } from '@/services/map'
 import { db } from '@/services/cloud'
-import { ll2Lnglat } from '@/services/map';
 
 const collection = db.collection('JArea')
 
@@ -29,21 +28,24 @@ let rightTop = new T.LngLat(120.19098, 30.1753)
 onMounted(() => {
   // 地图
   map = new T.Map('mapDiv')
+  map.centerAndZoom(lnglat2Ll(props.attraction.lnglat), defaultZoom)
 
-  onLocation().then((ll) => {
-    onRenderDrawMap()
-    map.centerAndZoom(lnglat2Ll(props.attraction.lnglat), defaultZoom)
-    // map.setMaxBounds(new T.LngLatBounds(leftBottom, rightTop))
-    if (props.defaultLnglat) {
-      onAddMarker(props.defaultLnglat)
-    }
-    getAreaList()
-    onAutoLocation()
-  })
+  onRenderDrawMap()
+  if (props.defaultLnglat) {
+    onAddMarker(props.defaultLnglat)
+  }
+  getAreaList()
+  onAutoLocation()
 })
 
+let testLlList = [{ lng: 120.19025, lat: 30.17306 }, { lng: 120.1898, lat: 30.17278 }, { lng: 120.18948, lat: 30.1725 }, { lng: 120.18901, lat: 30.172 }, { lng: 120.18842, lat: 30.17164 }, { lng: 120.18922, lat: 30.17272 }, { lng: 120.18879, lat: 30.17309 }, { lng: 120.1885, lat: 30.17338 }, { lng: 120.18786, lat: 30.17288 }, { lng: 120.18814, lat: 30.17374 }, { lng: 120.18763, lat: 30.17413 }, { lng: 120.18851, lat: 30.1741 }]
+let testLlListIndex = 0
 function onLocation(): Promise<LL> {
   return new Promise((s, j) => {
+    if (process.env.NODE_ENV === 'development') {
+      s(testLlList[testLlListIndex]) // 老街广场附近
+      return
+    }
     new T.Geolocation().getCurrentPosition(function (this: any, e: any) {
       const status = this.getStatus()
       if (status < 2) {
@@ -66,15 +68,16 @@ function onLocationSelf() {
 }
 
 function onAutoLocation() {
+  onLocation().then(ll => {
+    const lnglat = ll2Lnglat(ll)
+    markerSelf = onUpdateMarker(lnglat, markerSelf)
+    if (autoPlay.value) onAutoPlay(lnglat)
+  })
   setTimeout(() => {
+    if (testLlListIndex >= testLlList.length) return
+    if (autoPlay.value) testLlListIndex++
     onAutoLocation()
-    if (!autoPlay.value) return
-    onLocation().then(ll => {
-      const lnglat = ll2Lnglat(ll)
-      markerSelf = onUpdateMarker(lnglat, markerSelf)
-      onAutoPlay(lnglat)
-    })
-  }, 3000)
+  }, 10000)
 }
 
 function onAddMarker(lnglat: Lnglat, handleMarker = marker) {
@@ -86,7 +89,7 @@ function onAddMarker(lnglat: Lnglat, handleMarker = marker) {
 function onUpdateMarker(lnglat: Lnglat, handleMarker: any) {
   if (handleMarker) handleMarker.setLngLat(new T.LngLat(lnglat.longitude, lnglat.latitude))
   else handleMarker = onAddMarker(lnglat, handleMarker)
-  // map.centerAndZoom(lnglat2Ll(lnglat), defaultZoom) // 跟踪位置
+  map.centerAndZoom(lnglat2Ll(lnglat), defaultZoom) // 跟踪位置
   return handleMarker
 }
 
@@ -121,7 +124,6 @@ async function getAreaList() {
   const { data } = await collection.where({
     attractionId: props.attraction._id,
   }).limit(100).get()
-  map.panTo(new T.LngLat(props.attraction.lnglat.longitude, props.attraction.lnglat.latitude))
   onRenderAreaList(data)
   areaList.value = data
 }
@@ -139,45 +141,51 @@ function miniImage(url: string) {
 
 // 讲解区域
 const autoPlay = ref(false)
-const audio: Ref<HTMLAudioElement | null> = ref(null)
+const audioRef: Ref<HTMLAudioElement | null> = ref(null)
 const currentAudioSrc = ref('')
 
 onMounted(() => {
-  audio.value!.addEventListener('ended', e => {
-    console.log('语音自动讲解结束播完')
+  audioRef.value!.addEventListener('ended', e => {
     const currentPlayArea = areaList.value.find(i => i.playState === 'playing')
+    console.log(currentPlayArea?.name + ' 语音自动讲解结束播完')
     currentPlayArea && (currentPlayArea.playState = 'ended')
   })
 })
 
 function onChangeAuto() {
   autoPlay.value = !autoPlay.value
-  if (!autoPlay.value && !audio.value!.paused) audio.value!.pause()
+  if (!autoPlay.value && !audioRef.value!.paused) audioRef.value!.pause()
 }
 
 function onAutoPlay(lnglat: Lnglat) {
-  let minDistance = Infinity
+  let minDistance = 20
   let minArea: Area = areaList.value[0]
+  let name = ''
   areaList.value.forEach((item: Area) => {
     if (item.playState === 'ended') return
-    // 勾股定理开方
-    const distance = Math.sqrt(Math.pow(item.lnglat.longitude - lnglat.longitude, 2) + Math.pow(item.lnglat.latitude - lnglat.latitude, 2))
-    if (distance < minDistance) {
-      minDistance = distance
+    const dis = distance(lnglat, item.lnglat)
+    if (dis < minDistance) {
+      minDistance = dis
       minArea = item
+      name = item.name
     }
   })
-  onPlay(minArea)
+  if (name) {
+    console.log(name, minDistance)
+    onPlay(minArea)
+  } else {
+    console.log('没有找到区域')
+  }
 }
 
 async function onPlay(area: Area) {
-  const paused = audio.value!.paused
+  const paused = audioRef.value!.paused
   if (paused) {
     const areaIntroduce = await getAreaIntroduce(area)
     currentAudioSrc.value = areaIntroduce.voice
     nextTick(() => {
       area.playState = 'playing'
-      audio.value!.play()
+      audioRef.value!.play()
     })
   }
 }
@@ -220,7 +228,7 @@ async function getAreaIntroduce(area = areaList.value[0]) {
       </li>
     </ul>
   </div>
-  <audio ref="audio" :src="currentAudioSrc" class="audio-player fixed left-full"></audio>
+  <audio ref="audioRef" :src="currentAudioSrc" class="audio-player fixed left-full"></audio>
 </template>
 
 <style scoped>
