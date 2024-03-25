@@ -31,3 +31,15 @@ export async function getGeocoder(name: string): Promise<Lnglat | undefined> {
     }
   }
 }
+
+export function distance(lnglat1: Lnglat, lnglat2: Lnglat) {
+  const radLat1 = lnglat1.latitude * Math.PI / 180.0
+  const radLat2 = lnglat2.latitude * Math.PI / 180.0
+  const a = radLat1 - radLat2
+  const b = lnglat1.longitude * Math.PI / 180.0 - lnglat2.longitude * Math.PI / 180.0
+  let s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) +
+    Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)))
+  s = s * 6378.137
+  s = Math.round(s * 10000) / 10000
+  return s * 1000
+}
