@@ -10,11 +10,6 @@ const collection = db.collection('JArea')
 
 onMounted(() => {
   getAreaList(props.attraction._id)
-  audioRef.value!.addEventListener('ended', e => {
-    const currentPlayArea = areaListRef.value.find(i => i.playState === 'playing')
-    console.log(currentPlayArea?.name + ' 语音自动讲解结束播完')
-    currentPlayArea && (currentPlayArea.playState = 'ended')
-  })
 })
 
 const props = defineProps({
