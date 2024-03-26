@@ -3,3 +3,4 @@
 /// <reference types="./types/common" />
 /// <reference types="./types/glm" />
 /// <reference types="./types/attraction" />
+/// <reference types="./types/map" />

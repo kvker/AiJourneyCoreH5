@@ -41,7 +41,11 @@ export default class Map {
 
   constructor({ lnglat }: { lnglat: Lnglat }) {
     this.map = new T.Map('mapDiv')
-    this.map.centerAndZoom(Map.lnglat2Ll(lnglat), this.defaultZoom)
+    this.onSetCenter(lnglat)
+  }
+
+  onSetCenter(point: Lnglat | LL) {
+    this.map.centerAndZoom(Map.lnglat2Ll(Map.normalizeLnglat(point)), this.defaultZoom)
   }
 
   onRenderDrawMap(leftBottom: Lnglat, rightTop: Lnglat, imageUrl: string) {
@@ -79,7 +83,7 @@ export default class Map {
 
   onLocationSelf() {
     this.onLocation().then(ll => {
-      this.map.centerAndZoom(ll, this.defaultZoom)
+      this.onSetCenter(ll)
     })
   }
 
@@ -99,7 +103,6 @@ export default class Map {
   onUpdateMarker(lnglat: Lnglat, handleMarker: any) {
     if (handleMarker) handleMarker.setLngLat(new T.LngLat(lnglat.longitude, lnglat.latitude))
     else handleMarker = this.onAddMarker(lnglat, handleMarker)
-    this.map.centerAndZoom(Map.lnglat2Ll(lnglat), this.defaultZoom) // 跟踪位置
     return handleMarker
   }
 

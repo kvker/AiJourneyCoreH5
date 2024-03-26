@@ -1,0 +1,1 @@
+type MapOverlay = ({ lnglat: Lnglat, name: string } & CloudItem)

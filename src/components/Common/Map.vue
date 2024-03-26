@@ -17,6 +17,14 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  shouldResponseOverlay: {
+    type: Object as () => MapOverlay | null,
+  },
+})
+
+watch(() => props.shouldResponseOverlay, newOverlay => {
+  console.log(newOverlay)
+  newOverlay && mapInstance.onSetCenter(newOverlay.lnglat)
 })
 
 const emit = defineEmits<{
