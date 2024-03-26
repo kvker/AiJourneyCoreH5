@@ -23,7 +23,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits<{
-  (e: 'activeArea', area: Area): void
+  (e: 'activeArea', area: Area): void,
+  (e: 'closeIntroduce'): void,
 }>()
 
 watch(() => props.shouldResponseArea, newArea => {
@@ -62,6 +63,7 @@ function onMoveToArea(area: Area) {
 
 function onCloseIntroduce() {
   onCleanAreaIntroduce()
+  emit('closeIntroduce')
 }
 </script>
 

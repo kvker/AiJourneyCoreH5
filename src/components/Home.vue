@@ -29,6 +29,10 @@ function onActiveArea(area: Area) {
   }
   console.log('Home派发激活的景点：', currentActiveAreaRef.value.name)
 }
+
+function onCloseIntroduce() {
+  currentActiveAreaRef.value!.playState = 'ended'
+}
 </script>
 
 <template>
@@ -36,7 +40,7 @@ function onActiveArea(area: Area) {
     <Map :defaultLnglat="attractionRef.lnglat" :overlay-list="areaList" :readonly="autoPlayRef"
       :shouldResponseOverlay="currentActiveOverlayRef" @active-overlay="onActiveOverlay" />
     <AreaList v-model="areaList" :attraction="attractionRef" :shouldResponseArea="currentActiveAreaRef"
-      @active-area="onActiveArea" />
+      @active-area="onActiveArea" @close-introduce="onCloseIntroduce" />
   </div>
 </template>
 

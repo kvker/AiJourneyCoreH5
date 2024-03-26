@@ -1,1 +1,1 @@
-type MapOverlay = ({ lnglat: Lnglat, name: string } & CloudItem)
+type MapOverlay = { lnglat: Lnglat, name: string } & CloudItem & PlayState

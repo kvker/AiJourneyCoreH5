@@ -35,6 +35,7 @@ function onAutoPlay(lnglat: Lnglat) {
   let minDistance = 50
   let minItem: MapOverlay | undefined
   props.overlayList.forEach((item) => {
+    if(item.playState === 'ended') return
     const dis = Map.distance(lnglat, item.lnglat)
     if (dis < minDistance) {
       minDistance = dis

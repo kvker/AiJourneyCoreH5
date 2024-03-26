@@ -18,6 +18,8 @@ type CloudItem = {
   _id: string
 }
 
+type PlayState = { playState?: 'playing' | 'ended' | 'paused' }
+
 type Attraction = {
   name: string
   introduce: string
@@ -35,7 +37,7 @@ type Area = {
   lnglat: Lnglat
   name: string
   innerName: string // 内部使用名
-} & CloudItem & { playState?: 'playing' | 'ended' | 'paused' }
+} & CloudItem & PlayState
 
 type AreaSearchParams = {
   name: string
