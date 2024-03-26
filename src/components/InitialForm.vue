@@ -121,9 +121,7 @@ function onEnd() {
   localStorage.setItem('inititalFormed', 'true')
   localStorage.setItem('inititalForm', JSON.stringify(initialForm))
   isEnd.value = true
-  setTimeout(function () {
-    emit('formed')
-  }, 3000)
+  emit('formed')
 }
 </script>
 

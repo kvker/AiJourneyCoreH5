@@ -33,22 +33,30 @@ document.addEventListener('login', () => {
 })
 
 const inititalFormed = ref(!!localStorage.getItem('inititalFormed'))
+const removeInitialForm = ref(inititalFormed.value)
 
 const onChangeTabbarItem = ({ index }: { index: number }) => {
   router.push(import.meta.env.BASE_URL + ['', 'chat'][index])
+}
+
+function onFormed() {
+  inititalFormed.value = true
+  setTimeout(() => {
+    removeInitialForm.value = true
+  }, 3000)
 }
 </script>
 
 <template>
   <template v-if="idRef && attractionRef">
-    <router-view v-slot="{ Component }">
+    <router-view v-if="inititalFormed" v-slot="{ Component }">
       <keep-alive>
         <component :is="Component" />
       </keep-alive>
     </router-view>
-    <InitialForm v-if="!inititalFormed" @formed="inititalFormed = true" />
+    <InitialForm v-if="!removeInitialForm" @formed="onFormed" />
   </template>
-  <Tabbar @change="onChangeTabbarItem" />
+  <Tabbar v-if="inititalFormed" @change="onChangeTabbarItem" />
 </template>
 
 <style scoped></style>
