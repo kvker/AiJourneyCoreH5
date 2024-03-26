@@ -8,22 +8,22 @@ export function useAreaIntroduce(areaListRef: Ref<Area[]>) {
 
   // 讲解区域
   const autoPlayRef = inject('autoPlayRef') as Ref<boolean>
-  const currentAudioSrcRef = ref('')
   const audioRef: Ref<HTMLAudioElement | null> = ref(null)
+  const areaIntroduceRef = ref<AreaIntroduce | null>(null)
 
   onMounted(() => {
     audioRef.value!.addEventListener('ended', e => {
       const currentPlayArea = areaListRef.value.find(i => i.playState === 'playing')
       console.log(currentPlayArea?.name + ' 语音自动讲解结束播完')
       currentPlayArea && (currentPlayArea.playState = 'ended')
+      onCleanAreaIntroduce()
     })
   })
 
   async function onPlay(area: Area) {
     const paused = audioRef.value!.paused
     if (paused) {
-      const areaIntroduce = await getAreaIntroduce(area)
-      currentAudioSrcRef.value = areaIntroduce.voice
+      await getAreaIntroduce(area)
       nextTick(() => {
         area.playState = 'playing'
         audioRef.value!.play()
@@ -37,10 +37,14 @@ export function useAreaIntroduce(areaListRef: Ref<Area[]>) {
       areaId: area._id,
       chatStyleId: ['65b4d24bfdf6021d30d61a57', '65b4d246fdf6021d30d61a56', '65b4d2587ac027333bc13ddd'][chatStyleIndex],
     }).get()
-    const areaIntroduce = data[0]
-    console.log(areaIntroduce.introduce)
+    areaIntroduceRef.value = data[0]
+    console.log(areaIntroduceRef.value.introduce)
     console.log('讲解内容')
-    return areaIntroduce
   }
-  return { autoPlayRef, audioRef, currentAudioSrcRef, onPlay }
+
+  function onCleanAreaIntroduce() {
+    areaIntroduceRef.value = null
+  }
+
+  return { autoPlayRef, audioRef, onPlay, areaIntroduceRef, onCleanAreaIntroduce, }
 }

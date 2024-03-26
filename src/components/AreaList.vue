@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch, inject, onMounted } from 'vue'
 import type { Ref } from 'vue'
+import Introduce from '@/components/Introduce.vue'
 import { useAreaIntroduce } from '@/composables/areaIntroduce'
 import Static from '@/services/static'
 import { db } from '@/services/cloud'
@@ -31,7 +32,8 @@ const emit = defineEmits<{
 }>()
 
 watch(() => props.shouldResponseArea, newArea => {
-  console.log(newArea)
+  // console.log(newArea)
+  // console.log(props.shouldResponseArea)
   if (newArea) {
     onPlay(newArea)
     onMoveToArea(newArea)
@@ -40,7 +42,7 @@ watch(() => props.shouldResponseArea, newArea => {
 
 const areaListRef = defineModel({ default: [], required: true }) as Ref<Area[]>
 const ulRef = ref<HTMLUListElement | null>(null)
-const { autoPlayRef, audioRef, currentAudioSrcRef, onPlay } = useAreaIntroduce(areaListRef)
+const { autoPlayRef, audioRef, areaIntroduceRef, onPlay, onCleanAreaIntroduce } = useAreaIntroduce(areaListRef)
 
 async function getAreaList(attractionId: string) {
   const { data } = await collection.where({
@@ -61,6 +63,10 @@ function onClickArea(area: Area) {
 
 function onMoveToArea(area: Area) {
   ulRef.value!.scrollTop = areaListRef.value.indexOf(area) * 64
+}
+
+function onCloseIntroduce() {
+  onCleanAreaIntroduce()
 }
 </script>
 
@@ -87,7 +93,9 @@ function onMoveToArea(area: Area) {
       </li>
     </ul>
   </div>
-  <audio ref="audioRef" :src="currentAudioSrcRef" class="audio-player fixed left-full"></audio>
+  <audio ref="audioRef" :src="areaIntroduceRef?.voice" class="audio-player fixed left-full"></audio>
+  <Introduce v-if="areaIntroduceRef && props.shouldResponseArea" :area="props.shouldResponseArea"
+    :areaIntroduce="areaIntroduceRef" @close="onCloseIntroduce" />
 </template>
 
 <style scoped>
