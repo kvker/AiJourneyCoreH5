@@ -42,6 +42,7 @@ export default class Map {
   constructor({ lnglat }: { lnglat: Lnglat }) {
     this.map = new T.Map('mapDiv')
     this.onSetCenter(lnglat)
+    this.onLocationSelf()
   }
 
   onSetCenter(point: Lnglat | LL) {
@@ -59,7 +60,7 @@ export default class Map {
     this.map.addOverLay(img)
   }
 
-  testLlList = [{ lng: 120.19025, lat: 30.17306 }, { lng: 120.1898, lat: 30.17278 }, { lng: 120.18948, lat: 30.1725 }, { lng: 120.18901, lat: 30.172 }, { lng: 120.18842, lat: 30.17164 }, { lng: 120.18922, lat: 30.17272 }, { lng: 120.18879, lat: 30.17309 }, { lng: 120.1885, lat: 30.17338 }, { lng: 120.18786, lat: 30.17288 }, { lng: 120.18814, lat: 30.17374 }, { lng: 120.18763, lat: 30.17413 }, { lng: 120.18851, lat: 30.1741 }]
+  // testLlList = [{ lng: 120.19025, lat: 30.17306 }, { lng: 120.1898, lat: 30.17278 }, { lng: 120.18948, lat: 30.1725 }, { lng: 120.18901, lat: 30.172 }, { lng: 120.18842, lat: 30.17164 }, { lng: 120.18922, lat: 30.17272 }, { lng: 120.18879, lat: 30.17309 }, { lng: 120.1885, lat: 30.17338 }, { lng: 120.18786, lat: 30.17288 }, { lng: 120.18814, lat: 30.17374 }, { lng: 120.18763, lat: 30.17413 }, { lng: 120.18851, lat: 30.1741 }]
 
   async onLocation(): Promise<LL> {
     if (process.env.NODE_ENV === 'development') {
@@ -81,16 +82,16 @@ export default class Map {
     })
   }
 
-  onLocationSelf() {
-    this.onLocation().then(ll => {
-      this.onSetCenter(ll)
-    })
+  async onLocationSelf() {
+    const ll = await this.onLocation()
+    this.onSetCenter(ll)
+    this.onUpdateMarker(Map.ll2Lnglat(ll))
   }
 
   async onAutoLocation(): Promise<LL> {
     const ll = await this.onLocation()
     const lnglat = Map.ll2Lnglat(ll)
-    this.markerSelf = this.onUpdateMarker(lnglat, this.markerSelf)
+    this.onUpdateMarker(lnglat)
     return ll
   }
 
@@ -100,10 +101,9 @@ export default class Map {
     return handleMarker
   }
 
-  onUpdateMarker(lnglat: Lnglat, handleMarker: any) {
-    if (handleMarker) handleMarker.setLngLat(new T.LngLat(lnglat.longitude, lnglat.latitude))
-    else handleMarker = this.onAddMarker(lnglat, handleMarker)
-    return handleMarker
+  onUpdateMarker(lnglat: Lnglat) {
+    if (this.markerSelf) this.markerSelf.setLngLat(new T.LngLat(lnglat.longitude, lnglat.latitude))
+    else this.markerSelf = this.onAddMarker(lnglat, this.markerSelf)
   }
 
   onAddLabel({ text, lnglat, clickCallback }: { text: string, lnglat: Lnglat, clickCallback: (e: TmClickEventParams) => void }) {

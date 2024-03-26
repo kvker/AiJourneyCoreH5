@@ -28,6 +28,8 @@ export function useAreaIntroduce(areaListRef: Ref<Area[]>) {
         area.playState = 'playing'
         audioRef.value!.play()
       })
+    } else {
+      console.log('播放中，不予更新播放')
     }
   }
 
