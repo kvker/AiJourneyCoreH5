@@ -32,7 +32,7 @@ const emit = defineEmits<{
 }>()
 
 function onAutoPlay(lnglat: Lnglat) {
-  let minDistance = 20
+  let minDistance = 50
   let minItem: MapOverlay | undefined
   props.overlayList.forEach((item) => {
     const dis = Map.distance(lnglat, item.lnglat)
@@ -44,6 +44,8 @@ function onAutoPlay(lnglat: Lnglat) {
   if (minItem) {
     console.log('查询到满足条件的最近景点是： ', minItem.name)
     emit('activeOverlay', minItem)
+  } else {
+    console.log('未命中最近景区')
   }
 }
 
@@ -76,10 +78,13 @@ function onClickMapLabel(e: TmClickEventParams) {
 }
 
 async function onEventLoop() {
-  const lnglat = await mapInstance.onAutoLocation()
-  if (props.readonly) mapInstance.onSetCenter(lnglat)
+  if (props.readonly) {
+    console.log('readonly loop')
+    const lnglat = await mapInstance.onAutoLocation()
+    mapInstance.onSetCenter(lnglat)
+    onAutoPlay(Map.normalizeLnglat(lnglat))
+  }
   setTimeout(onEventLoop, 10000)
-  if (props.readonly) onAutoPlay(Map.normalizeLnglat(lnglat))
 }
 </script>
 
