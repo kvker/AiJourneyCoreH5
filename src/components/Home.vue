@@ -31,7 +31,9 @@ function onActiveArea(area: Area) {
 }
 
 function onCloseIntroduce() {
+  console.log('Home 响应介绍的关闭事件')
   currentActiveAreaRef.value!.playState = 'ended'
+  currentActiveAreaRef.value = null
 }
 </script>
 
