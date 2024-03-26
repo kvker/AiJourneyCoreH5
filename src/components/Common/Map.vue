@@ -61,7 +61,9 @@ async function onEventLoop() {
 <template>
   <div id="mapDiv" class=""></div>
   <button class="location-button btn btn-primary btn-sm top-8 right-2" :disabled="autoPlay"
-    @click="mapInstance.onLocationSelf">定位当前</button>
+    @click="mapInstance.onLocationSelf">
+    <img class="local-icon w-4 h-4" src="/icons/local.png" alt="local-icon">
+    同步定位</button>
   <div class="area-list w-full left-0 bottom-16 translate-y-0 transition-transform"
     :class="autoPlay ? 'translate-y-48' : 'translate-y-0'">
     <div class="w-24 bg-white rounded-lg flex flex-col items-center justify-center ml-auto mr-2 mb-2"
@@ -84,6 +86,7 @@ async function onEventLoop() {
     </ul>
   </div>
   <audio ref="audioRef" :src="currentAudioSrc" class="audio-player fixed left-full"></audio>
+
 </template>
 
 <style scoped>
