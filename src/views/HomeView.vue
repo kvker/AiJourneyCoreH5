@@ -7,28 +7,35 @@ import router from '@/router'
 import { useRoute } from 'vue-router'
 import { db } from '@/services/cloud'
 
+const { query } = useRoute()
 // 景区ID，长河老街?attractionId=65bdf3579beccb0820f313ad
-let idRef = ref(localStorage.getItem('attractionId') as string)
+let idRef = ref(query.attractionId as string)
 // console.log(idRef.value)
 if (!idRef.value) {
-  const { query, params } = useRoute()
-  idRef.value = query.attractionId as string
+  idRef.value = localStorage.getItem('attractionId') as string
   if (idRef.value) {
     localStorage.setItem('attractionId', idRef.value)
   } else {
     alert('进入方式错误，请从官方渠道进入')
+    localStorage.clear()
     throw new Error('进入方式错误，请从官方渠道进入')
   }
 }
 
-const attractionRef: Ref<Attraction> = ref(JSON.parse(localStorage.getItem('attraction') as string))
+const attractionRef: Ref<Attraction | null> = ref(JSON.parse(localStorage.getItem('attraction') as string))
 // 如果依赖用户登录（或匿名登录），则需要监听此事件
 document.addEventListener('login', () => {
   db.collection('JAttraction').doc(idRef.value).get()
     .then(({ data }: { data: Attraction[] }) => {
-      attractionRef.value = data[0]
-      document.title = attractionRef.value.name
-      localStorage.setItem('attraction', JSON.stringify(attractionRef.value))
+      if (data[0]) {
+        attractionRef.value = data[0]
+        document.title = attractionRef.value.name
+        localStorage.setItem('attraction', JSON.stringify(attractionRef.value))
+      } else {
+        localStorage.clear()
+        attractionRef.value = null
+        alert('未知景点，请检查入口')
+      }
     })
 })
 
