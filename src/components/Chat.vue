@@ -3,7 +3,8 @@ import { ref, computed, watch, nextTick } from 'vue'
 import type { Ref } from 'vue'
 import LLM from '@/services/llm'
 
-const llm = new LLM()
+const attraction: Attraction = JSON.parse(localStorage.getItem('attraction') as string)
+const llm = new LLM(attraction)
 
 // 对话模块
 const lastContent = ref('')

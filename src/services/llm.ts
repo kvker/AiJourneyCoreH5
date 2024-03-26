@@ -3,14 +3,14 @@ import { faasChatUrl } from '@/services/config'
 type GlmResponseJson = { "id": string, "created": number, "model": string, "choices": { "index": number, "finish_reason"?: "stop", "delta": { "role": "assistant", "content": string } }[], "usage"?: { "prompt_tokens": number, "completion_tokens": number, "total_tokens": number } }
 
 type LlmCb = (result: string) => void
-// JSON.parse(localStorage.getItem('attraction') as Attraction
 export default class LLM {
   controller: AbortController | undefined
   knowledgeId: string
 
-  constructor() {
-    const attraction: Attraction = JSON.parse(localStorage.getItem('attraction') as string)
-    this.knowledgeId = attraction.knowledgeId as string
+  constructor({
+    knowledgeId
+  }: { knowledgeId: string }) {
+    this.knowledgeId = knowledgeId
   }
 
   async onCompletions(content: string | GlmMessage[], SseCB: LlmCb, doneCb?: LlmCb) {
