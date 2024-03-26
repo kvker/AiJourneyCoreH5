@@ -77,9 +77,9 @@ export default class Map {
     })
   }
 
-  onLocationSelf(map: any,) {
+  onLocationSelf() {
     this.onLocation().then(ll => {
-      map.centerAndZoom(ll, this.defaultZoom)
+      this.map.centerAndZoom(ll, this.defaultZoom)
     })
   }
 
