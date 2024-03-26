@@ -4,29 +4,28 @@ import type { Ref } from 'vue'
 import Map from '@/services/map'
 import type { TmClickEventParams } from '@/services/map'
 
-type OverlayItem = ({ lnglat: Lnglat, name: string } & CloudItem)
-
 const props = defineProps({
   defaultLnglat: {
-    type: Object as () => Lnglat | null,
-    default: null,
-  },
-  attraction: {
-    type: Object as () => Attraction,
+    type: Object as () => Lnglat,
     required: true,
   },
   overlayList: {
-    type: Array as () => OverlayItem[],
+    type: Array as () => MapOverlay[],
     default: () => [],
-  }
+  },
+  readonly: {
+    type: Boolean,
+    required: true,
+  },
 })
 
-// 讲解区域
-const autoPlay = inject('autoPlay') as Ref<boolean>
+const emit = defineEmits<{
+  (e: 'activeOverlay', overlay: MapOverlay): void
+}>()
 
 function onAutoPlay(lnglat: Lnglat) {
   let minDistance = 20
-  let minItem = props.overlayList[0]
+  let minItem: MapOverlay | undefined
   props.overlayList.forEach((item) => {
     const dis = Map.distance(lnglat, item.lnglat)
     if (dis < minDistance) {
@@ -34,6 +33,10 @@ function onAutoPlay(lnglat: Lnglat) {
       minItem = item
     }
   })
+  if (minItem) {
+    console.log('查询到满足条件的最近景点是： ', minItem.name)
+    emit('activeOverlay', minItem)
+  }
 }
 
 const darwMapObject = {
@@ -45,14 +48,11 @@ let mapInstance: Map
 onMounted(async () => {
   // 地图
   mapInstance = new Map({
-    lnglat: props.attraction.lnglat,
+    lnglat: props.defaultLnglat,
   })
 
   mapInstance.onRenderDrawMap(new T.LngLat(...darwMapObject.leftBottom), new T.LngLat(...darwMapObject.rightTop), darwMapObject.url)
 
-  if (props.defaultLnglat) {
-    mapInstance.onAddMarker(props.defaultLnglat)
-  }
   onEventLoop()
 })
 
@@ -64,19 +64,20 @@ watch(() => props.overlayList, () => {
 
 function onClickMapLabel(e: TmClickEventParams) {
   console.log('点击了地图标签: ', e.target.options.text)
+  emit('activeOverlay', props.overlayList.find((item) => item.name === e.target.options.text) as MapOverlay)
 }
 
 async function onEventLoop() {
   const lnglat = await mapInstance.onAutoLocation()
-  if (autoPlay.value) mapInstance.onSetCenter(lnglat)
+  if (props.readonly) mapInstance.onSetCenter(lnglat)
   setTimeout(onEventLoop, 10000)
-  if (autoPlay.value) onAutoPlay(Map.normalizeLnglat(lnglat))
+  if (props.readonly) onAutoPlay(Map.normalizeLnglat(lnglat))
 }
 </script>
 
 <template>
   <div id="mapDiv" class=""></div>
-  <button class="location-button btn btn-primary btn-sm top-8 right-2" :disabled="autoPlay"
+  <button class="location-button btn btn-primary btn-sm top-8 right-2" :disabled="props.readonly"
     @click="mapInstance.onLocationSelf">
     <img class="local-icon w-4 h-4" src="/icons/local.png" alt="local-icon">
     同步定位
